@@ -18,4 +18,6 @@ class testApp : public ofBaseApp {
 		void mouseReleased(int x, int y, int button);
 	
 		ofEasyCam cam; // add mouse controls for camera movement
+  //  ofCamera cam2;
+        
 };

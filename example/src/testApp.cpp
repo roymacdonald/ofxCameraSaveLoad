@@ -42,7 +42,6 @@ void testApp::draw(){
 	cam.end();
 	ofSetColor(255);
 }
-
 //--------------------------------------------------------------
 void testApp::keyPressed(int key){
 	switch(key) {
@@ -51,7 +50,9 @@ void testApp::keyPressed(int key){
 			ofToggleFullscreen();
 			break;
         case 's':
-            ofxSaveCamera(cam, "camaraSettings");
+            ofxSaveCamera(cam, "ofEasyCamSettings");
+     //       ofxSaveCamera(cam2, "ofCameraSettings");
+            cam.save("ofEasyCam");
             break;
         case 'r':
             cam.reset();
@@ -59,7 +60,11 @@ void testApp::keyPressed(int key){
             cam.setForceAspectRatio(false);
             break;
         case 'l':
-            ofxLoadCamera(cam, "camaraSettings");
+            cam.load("ofEasyCam");
+            break;
+        case 'k':
+            ofxLoadCamera(cam, "ofEasyCam");
+       //     ofxLoadCamera(cam2, "ofCameraSettings");
             break;
 	}
     
