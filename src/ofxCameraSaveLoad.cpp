@@ -122,7 +122,7 @@ bool ofxLoadCamera(ofEasyCam & cam, string loadPath){
                 vector<string> vals = ofSplitString(buffer.getNextLine(), ", ");
                 if (vals.size()==3) {
                     ofVec3f trgt (ofToFloat(vals[0]), ofToFloat(vals[1]), ofToFloat(vals[2]));
-        //             cam.getTarget().setPosition(trgt);
+                     cam.getTarget().setPosition(trgt);
                 }
             }
             else if(line == "drag"){
