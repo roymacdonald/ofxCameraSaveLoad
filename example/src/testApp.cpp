@@ -41,6 +41,7 @@ void testApp::draw(){
 	ofPopMatrix();
 	cam.end();
 	ofSetColor(255);
+    ofDrawBitmapStringHighlight("press key:\n\'s\' to save camera.\n\'l\' to load", 50, 50);
 }
 //--------------------------------------------------------------
 void testApp::keyPressed(int key){
@@ -51,8 +52,6 @@ void testApp::keyPressed(int key){
 			break;
         case 's':
             ofxSaveCamera(cam, "ofEasyCamSettings");
-     //       ofxSaveCamera(cam2, "ofCameraSettings");
-            cam.save("ofEasyCam");
             break;
         case 'r':
             cam.reset();
@@ -60,11 +59,7 @@ void testApp::keyPressed(int key){
             cam.setForceAspectRatio(false);
             break;
         case 'l':
-            cam.load("ofEasyCam");
-            break;
-        case 'k':
-            ofxLoadCamera(cam, "ofEasyCam");
-       //     ofxLoadCamera(cam2, "ofCameraSettings");
+            ofxLoadCamera(cam, "ofEasyCamSettings");
             break;
 	}
     
