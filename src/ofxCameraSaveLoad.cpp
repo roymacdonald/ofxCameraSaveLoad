@@ -9,8 +9,8 @@ static bool saveOfCam(ofCamera &cam, string savePath){
     buffer.append("near\n" + ofToString(cam.getNearClip())+"\n");
     buffer.append("far\n" + ofToString(cam.getFarClip())+"\n");
     buffer.append("lensOffset\n" + ofToString(cam.getLensOffset())+"\n");
-    //buffer.append("forceAspectRatio\n" + ofToString(cam.forceAspectRatio)+"\n");
-    //buffer.append("aspectRatio\n" + ofToString(cam.aspectRatio) + "\n");
+    buffer.append("forceAspectRatio\n" + ofToString(cam.getForceAspectRatio())+"\n");
+    buffer.append("aspectRatio\n" + ofToString(cam.getAspectRatio()) + "\n");
     buffer.append("isOrtho\n" + ofToString(cam.getOrtho()) + "\n");
     
     if(ofBufferToFile(savePath, buffer)){
@@ -31,7 +31,7 @@ static bool loadOfCam(ofCamera &cam, string loadPath){
         return false;
 	}
 	float aRatio;
-    bool bForceAspect;
+    bool bForceAspect =false;
 	ofBuffer buffer(file);  
 	while (!buffer.isLastLine()) {
 		string line = buffer.getNextLine();
@@ -70,9 +70,9 @@ static bool loadOfCam(ofCamera &cam, string loadPath){
             }
         }
 	}
-    //if (bForceAspect){
-      //  cam.setAspectRatio(aRatio);
-    //}
+    if (bForceAspect){
+        cam.setAspectRatio(aRatio);
+    }
     
     return true;
 
@@ -95,7 +95,7 @@ bool ofxSaveCamera(ofEasyCam & cam, string savePath){
         buffer.append("target\n" + ofToString(cam.getTarget().getPosition()) + "\n" );
         buffer.append("bEnableMouseMiddleButton\n" + ofToString(cam.getMouseMiddleButtonEnabled())+"\n");
         buffer.append("bMouseInputEnabled\n" + ofToString(cam.getMouseInputEnabled())+"\n");
-//        buffer.append("bAutoDistance\n" + ofToString(cam.bAutoDistance)+"\n");
+        buffer.append("bAutoDistance\n" + ofToString(cam.getBAutoDistance())+"\n");
         buffer.append("drag\n" + ofToString(cam.getDrag())+"\n");
         buffer.append("doTranslationKey\n" + ofToString(cam.getTranslationKey())+"\n");
         
@@ -121,8 +121,7 @@ bool ofxLoadCamera(ofEasyCam & cam, string loadPath){
             if (line == "target") {
                 vector<string> vals = ofSplitString(buffer.getNextLine(), ", ");
                 if (vals.size()==3) {
-                    ofVec3f trgt (ofToFloat(vals[0]), ofToFloat(vals[1]), ofToFloat(vals[2]));
-                     cam.getTarget().setPosition(trgt);
+                    cam.getTarget().setPosition(ofVec3f(ofToFloat(vals[0]), ofToFloat(vals[1]), ofToFloat(vals[2])));
                 }
             }
             else if(line == "drag"){
@@ -140,8 +139,7 @@ bool ofxLoadCamera(ofEasyCam & cam, string loadPath){
                     cam.disableMouseInput();
                 }
             }else if(line == "bAutoDistance"){
-               //cam.setAutoDistance(ofToBool(
-                 buffer.getNextLine();//));
+               cam.setAutoDistance(ofToBool(buffer.getNextLine()));
             }else if(line == "doTranslationKey"){
                 cam.setTranslationKey(ofToChar(buffer.getNextLine()));
             }
