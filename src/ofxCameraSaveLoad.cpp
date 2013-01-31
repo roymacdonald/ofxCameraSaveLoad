@@ -9,8 +9,10 @@ static bool saveOfCam(ofCamera &cam, string savePath){
     buffer.append("near\n" + ofToString(cam.getNearClip())+"\n");
     buffer.append("far\n" + ofToString(cam.getFarClip())+"\n");
     buffer.append("lensOffset\n" + ofToString(cam.getLensOffset())+"\n");
+#ifndef USE_DEVELOP_BRANCH
     buffer.append("forceAspectRatio\n" + ofToString(cam.getForceAspectRatio())+"\n");
     buffer.append("aspectRatio\n" + ofToString(cam.getAspectRatio()) + "\n");
+#endif
     buffer.append("isOrtho\n" + ofToString(cam.getOrtho()) + "\n");
     
     if(ofBufferToFile(savePath, buffer)){
@@ -57,10 +59,12 @@ static bool loadOfCam(ofCamera &cam, string loadPath){
             if (vals.size()==2) {
                 cam.setLensOffset(ofVec2f(ofToFloat(vals[0]), ofToFloat(vals[1])));
             }
+#ifndef USE_DEVELOP_BRANCH  
         }else if(line == "forceAspectRatio"){
             bForceAspect = ofToBool(buffer.getNextLine());
             cam.setForceAspectRatio(bForceAspect);
         }else if(line == "aspectRatio"){
+#endif
             aRatio = ofToFloat(buffer.getNextLine());
         }else if(line == "isOrtho"){
             if(ofToBool(buffer.getNextLine())){

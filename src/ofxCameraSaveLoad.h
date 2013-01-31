@@ -1,5 +1,7 @@
 #include "ofMain.h"
 
+#define USE_DEVELOP_BRANCH
+
 bool ofxSaveCamera(ofCamera &cam, string savePath);
 bool ofxLoadCamera(ofCamera &cam, string loadPath);
 bool ofxSaveCamera(ofEasyCam &cam, string savePath);

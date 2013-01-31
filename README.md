@@ -19,10 +19,16 @@ None
 
 Compatibility
 ------------
-latest update from develop branch
+0073
+probably 0072 should also work (not tested).
+Yet I recommend using the latest develop version of openFrameworks.
+
 
 Known issues
 ------------
+When not using the latest version of OFs develop branch  there are to getter methods missing in ofCamera, so Is not possible to save the entire camera status.
+this getters are for forceAspectRatio and aspectRatio. In this case you must comment this line from ofxCameraSaveLoad.h `#define USE_DEVELOP_BRANCH`
+
 
 
 Version history
