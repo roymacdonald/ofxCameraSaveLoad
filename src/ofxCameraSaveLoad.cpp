@@ -95,11 +95,9 @@ bool ofxSaveCamera(ofEasyCam & cam, string savePath){
         buffer.append("target\n" + ofToString(cam.getTarget().getPosition()) + "\n" );
         buffer.append("bEnableMouseMiddleButton\n" + ofToString(cam.getMouseMiddleButtonEnabled())+"\n");
         buffer.append("bMouseInputEnabled\n" + ofToString(cam.getMouseInputEnabled())+"\n");
-        buffer.append("bAutoDistance\n" + ofToString(cam.getBAutoDistance())+"\n");
         buffer.append("drag\n" + ofToString(cam.getDrag())+"\n");
         buffer.append("doTranslationKey\n" + ofToString(cam.getTranslationKey())+"\n");
-        
-        if(ofBufferToFile(savePath, buffer)){
+         if(ofBufferToFile(savePath, buffer)){
             ofLogNotice("ofEasyCam saved successfully!");
             return true;
         }else{
@@ -114,8 +112,7 @@ bool ofxSaveCamera(ofEasyCam & cam, string savePath){
 bool ofxLoadCamera(ofEasyCam & cam, string loadPath){
     if(loadOfCam((ofCamera &)cam, loadPath)){
         ofBuffer buffer = ofBufferFromFile(loadPath);
-        
-        while (!buffer.isLastLine()) {
+         while (!buffer.isLastLine()) {
             string line = buffer.getNextLine();
             
             if (line == "target") {
@@ -138,8 +135,6 @@ bool ofxLoadCamera(ofEasyCam & cam, string loadPath){
                 }else{
                     cam.disableMouseInput();
                 }
-            }else if(line == "bAutoDistance"){
-               cam.setAutoDistance(ofToBool(buffer.getNextLine()));
             }else if(line == "doTranslationKey"){
                 cam.setTranslationKey(ofToChar(buffer.getNextLine()));
             }
