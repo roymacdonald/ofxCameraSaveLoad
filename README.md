@@ -19,15 +19,11 @@ None
 
 Compatibility
 ------------
-0073 onwards
+latest update from develop branch
 
 Known issues
 ------------
-Works, yet there are a few parameter that cant be saved because there are no accessors implemented in the core.
-This are:
-bool ofCamera::forceAspectRatio
-float ofCamera::aspectRatio
-bool ofEasyCam::bAutoDistance
+
 
 Version history
 ------------
