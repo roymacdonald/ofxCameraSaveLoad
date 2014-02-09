@@ -1,6 +1,45 @@
 #include "ofxCameraSaveLoad.h"
 
 //----------------------------------------
+static bool saveOfNode(ofNode &node, string savePath){
+    ofBuffer buffer;
+    buffer.append("--------------ofNode parameters--------------\n");
+    buffer.append("transformMatrix\n" + ofToString(node.getGlobalTransformMatrix()) + "\n" );    
+    if(ofBufferToFile(savePath, buffer)){
+        ofLogNotice("ofCamera saved successfully!");
+        return true;
+    }else{
+        ofLogWarning("failed to save ofCamera!");
+        return false;
+    }
+}
+//----------------------------------------
+static bool loadOfNode(ofNode &node, string loadPath){
+    ofFile file(loadPath);
+	
+	if(!file.exists()){
+		ofLogError("The file " + loadPath + " is missing");
+        return false;
+	}
+	ofBuffer buffer(file);  
+	while (!buffer.isLastLine()) {
+		string line = buffer.getNextLine();
+        if (line == "transformMatrix") {
+            string str =buffer.getNextLine() + "\n";
+            str += buffer.getNextLine() + "\n";
+            str += buffer.getNextLine() + "\n";
+            str += buffer.getNextLine();
+            
+            ofMatrix4x4 m;
+            istringstream iss;
+            iss.str(str);
+            iss >> m;
+            node.setTransformMatrix(m);
+		}
+	}    
+    return true;
+}
+//----------------------------------------
 static bool saveOfCam(ofCamera &cam, string savePath){
     ofBuffer buffer;
     buffer.append("--------------ofCamera parameters--------------\n");
@@ -80,6 +119,14 @@ static bool loadOfCam(ofCamera &cam, string loadPath){
     
     return true;
 
+}
+//----------------------------------------
+bool ofxSaveCamera(ofNode &node, string savePath){
+	return saveOfNode(node, savePath);
+}
+//----------------------------------------
+bool ofxLoadCamera(ofNode &node, string loadPath){
+	return loadOfNode(node, loadPath);
 }
 //----------------------------------------
 bool ofxSaveCamera(ofCamera &cam, string savePath){
