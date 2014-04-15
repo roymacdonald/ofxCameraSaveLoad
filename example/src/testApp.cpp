@@ -3,10 +3,7 @@
 //--------------------------------------------------------------
 void testApp::setup(){
 	ofSetVerticalSync(true);
-    glEnable(GL_DEPTH_TEST);
-	cam.setDistance(100);
-    cam.setLensOffset(ofVec2f(1, 0));
-    cam.setAspectRatio(1);
+    ofxLoadCamera(cam, "ofEasyCamSettings");
 }
 
 //--------------------------------------------------------------
@@ -25,21 +22,22 @@ void testApp::draw(){
 	
 	ofSetColor(255,0,0);
 	ofFill();
-	ofBox(30);
+	ofDrawBox(30);
 	ofNoFill();
 	ofSetColor(0);
-	ofBox(30);
+	ofDrawBox(30);
 	
 	ofPushMatrix();
 	ofTranslate(0,0,20);
 	ofSetColor(0,0,255);
 	ofFill();
-	ofBox(5);
+	ofDrawBox(5);
 	ofNoFill();
 	ofSetColor(0);
-	ofBox(5);
+	ofDrawBox(5);
 	ofPopMatrix();
 	cam.end();
+	
 	ofSetColor(255);
     ofDrawBitmapStringHighlight("press key:\n\'s\' to save camera.\n\'l\' to load", 50, 50);
 }

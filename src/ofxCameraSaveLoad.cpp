@@ -161,6 +161,8 @@ bool ofxSaveCamera(ofEasyCam & cam, string savePath){
 }
 //----------------------------------------
 bool ofxLoadCamera(ofEasyCam & cam, string loadPath){
+	cam.setAutoDistance(false);
+
     if(loadOfCam((ofCamera &)cam, loadPath)){
         ofBuffer buffer = ofBufferFromFile(loadPath);
          while (!buffer.isLastLine()) {
