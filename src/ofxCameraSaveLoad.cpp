@@ -1,200 +1,181 @@
 #include "ofxCameraSaveLoad.h"
-
+#ifdef USE_GLM
+typedef glm::vec3 v3 ;
+typedef glm::vec2 v2;
+typedef glm::quat qq;
+#else
+typedef ofVec3f v3;
+typedef ofVec2f v2;
+typedef ofQuaternion qq;
+#endif
 //----------------------------------------
-static bool saveOfNode(ofNode &node, string savePath){
-    ofBuffer buffer;
-    buffer.append("--------------ofNode parameters--------------\n");
-    buffer.append("transformMatrix\n" + ofToString(node.getGlobalTransformMatrix()) + "\n" );    
-    if(ofBufferToFile(savePath, buffer)){
-        ofLogNotice("ofCamera saved successfully!");
-        return true;
-    }else{
-        ofLogWarning("failed to save ofCamera!");
-        return false;
-    }
-}
-//----------------------------------------
-static bool loadOfNode(ofNode &node, string loadPath){
-    ofFile file(loadPath);
-	
-	if(!file.exists()){
-		ofLogError("The file " + loadPath + " is missing");
-        return false;
-	}
-	ofBuffer buffer(file);  
-	while (!buffer.isLastLine()) {
-		string line = buffer.getNextLine();
-        if (line == "transformMatrix") {
-            string str =buffer.getNextLine() + "\n";
-            str += buffer.getNextLine() + "\n";
-            str += buffer.getNextLine() + "\n";
-            str += buffer.getNextLine();
-            
-            ofMatrix4x4 m;
-            istringstream iss;
-            iss.str(str);
-            iss >> m;
-            node.setTransformMatrix(m);
+template<class T>
+T readValue(const string& valueName, ofBuffer& buffer, T val){
+	for (ofBuffer::Line it = buffer.getLines().begin(), end = buffer.getLines().end(); it != end; ++it) {
+		if (!it->empty()) {
+			if ((string)(*it) == valueName) {
+				it++;
+				if (it != end) {
+					istringstream iss;
+					iss.str((string)(*it));
+					iss >> val;
+#if PRINT_DEBUG
+					cout << "readValue " << valueName << " : " << *it << endl;
+#endif
+					return val;
+				}
+			}
 		}
-	}    
-    return true;
+	}
+	return val;
 }
 //----------------------------------------
-static bool saveOfCam(ofCamera &cam, string savePath){
-    ofBuffer buffer;
-    buffer.append("--------------ofCamera parameters--------------\n");
-    buffer.append("transformMatrix\n" + ofToString(cam.getGlobalTransformMatrix()) + "\n" );
-    buffer.append("fov\n" + ofToString(cam.getFov())+"\n");
-    buffer.append("near\n" + ofToString(cam.getNearClip())+"\n");
-    buffer.append("far\n" + ofToString(cam.getFarClip())+"\n");
-    buffer.append("lensOffset\n" + ofToString(cam.getLensOffset())+"\n");
-#ifndef USE_DEVELOP_BRANCH
-    buffer.append("forceAspectRatio\n" + ofToString(cam.getForceAspectRatio())+"\n");
-    buffer.append("aspectRatio\n" + ofToString(cam.getAspectRatio()) + "\n");
-#endif
-    buffer.append("isOrtho\n" + ofToString(cam.getOrtho()) + "\n");
-    
-    if(ofBufferToFile(savePath, buffer)){
-        ofLogNotice("ofCamera saved successfully!");
-        return true;
-    }else{
-        ofLogWarning("failed to save ofCamera!");
-        return false;
-    }
-
-}
-//----------------------------------------
-static bool loadOfCam(ofCamera &cam, string loadPath){
-    ofFile file(loadPath);
+template<class T>
+void writeValue(const string& valueName, T val, ofBuffer& buffer){
+	buffer.append(valueName + "\n"+ ofToString(val) + "\n");
 	
-	if(!file.exists()){
-		ofLogError("The file " + loadPath + " is missing");
-        return false;
-	}
-	float aRatio;
-    bool bForceAspect =false;
-	ofBuffer buffer(file);  
-	while (!buffer.isLastLine()) {
-		string line = buffer.getNextLine();
-        if (line == "transformMatrix") {
-            string str =buffer.getNextLine() + "\n";
-            str += buffer.getNextLine() + "\n";
-            str += buffer.getNextLine() + "\n";
-            str += buffer.getNextLine();
-            
-            ofMatrix4x4 m;
-            istringstream iss;
-            iss.str(str);
-            iss >> m;
-            cam.setTransformMatrix(m);
-         }else if(line == "fov"){
-            cam.setFov(ofToFloat(buffer.getNextLine()));
-        }else if(line == "near"){
-            cam.setNearClip(ofToFloat(buffer.getNextLine()));
-        }else if(line == "far"){
-            cam.setFarClip(ofToFloat(buffer.getNextLine()));
-        }else if(line == "lensOffset"){
-            vector<string> vals = ofSplitString(buffer.getNextLine(), ", ");
-            if (vals.size()==2) {
-                cam.setLensOffset(ofVec2f(ofToFloat(vals[0]), ofToFloat(vals[1])));
-            }
-#ifndef USE_DEVELOP_BRANCH  
-        }else if(line == "forceAspectRatio"){
-            bForceAspect = ofToBool(buffer.getNextLine());
-            cam.setForceAspectRatio(bForceAspect);
-        }else if(line == "aspectRatio"){
+#if PRINT_DEBUG
+	cout << "writeValue " << valueName << " : "+ ofToString(val) <<endl;
 #endif
-            aRatio = ofToFloat(buffer.getNextLine());
-        }else if(line == "isOrtho"){
-            if(ofToBool(buffer.getNextLine())){
-                cam.enableOrtho();
-            }else{
-                cam.disableOrtho();
-            }
-        }
-	}
-    if (bForceAspect){
-        cam.setAspectRatio(aRatio);
-    }
-    
-    return true;
-
 }
 //----------------------------------------
-bool ofxSaveCamera(ofNode &node, string savePath){
-	return saveOfNode(node, savePath);
+static bool saveBuffer(const string& savePath, ofBuffer& buffer){
+	if(ofBufferToFile(savePath, buffer)){
+		ofLogNotice("[ofxCameraSaveLoad] : File " + savePath + " saved successfully!");
+		return true;
+	}else{
+		ofLogWarning("[ofxCameraSaveLoad] : File " + savePath + " failed to save!");
+		return false;
+	}
+}
+//----------------------------------------
+static bool loadBuffer(const string& loadPath, ofBuffer& buffer){
+	ofFile file(loadPath);
+	if(!file.exists()){
+		ofLogError("[ofxCameraSaveLoad] : File " + loadPath + " is missing!");
+		return false;
+	}
+	buffer = ofBufferFromFile(loadPath);
+	if(buffer.size() == 0){
+		ofLogNotice("[ofxCameraSaveLoad] : File " + loadPath + " is empty!");
+		return false;
+	}
+	return true;
+}
+//----------------------------------------
+static void saveOfNode(const ofNode &node, ofBuffer& buffer){
+	buffer.append("--------------ofNode parameters--------------\n");
+	writeValue<v3>("position", node.getPosition(), buffer);
+	writeValue<v3>("scale",node.getScale(), buffer);
+	writeValue<qq>("orientation", node.getOrientationQuat(),buffer);
+}
+//----------------------------------------
+static void loadOfNode(ofNode &node, ofBuffer& buffer){
+	node.setPosition(readValue<v3>("position", buffer, node.getPosition()));
+	node.setScale(readValue<v3>("scale",buffer, node.getScale()));
+	node.setOrientation(readValue<qq>("orientation", buffer, node.getOrientationQuat()));
+}
+//----------------------------------------
+static void saveOfCam(const ofCamera &cam, ofBuffer& buffer){
+	saveOfNode(cam, buffer);
+	buffer.append("--------------ofCamera parameters--------------\n");
+	writeValue<float>("fov",cam.getFov(),buffer);
+	writeValue<float>("near", cam.getNearClip(),buffer);
+	writeValue<float>("far", cam.getFarClip(),buffer);
+	writeValue<v2>("lensOffset", cam.getLensOffset(),buffer);
+	writeValue<bool>("forceAspectRatio", cam.getForceAspectRatio(),buffer);
+	writeValue<float>("aspectRatio", cam.getAspectRatio(),buffer);
+	writeValue<bool>("isOrtho",cam.getOrtho(),buffer);
+	writeValue<bool>("vFlip", cam.isVFlipped(), buffer);
+}
+//----------------------------------------
+static void loadOfCam(ofCamera &cam, ofBuffer& buffer){
+	loadOfNode(cam, buffer);
+	cam.setFov(readValue<float>("fov", buffer, cam.getFov()));
+	cam.setNearClip(readValue<float>("near",buffer, cam.getNearClip()));
+	cam.setFarClip(readValue<float>("far",buffer,cam.getFarClip()));
+	cam.setLensOffset(readValue<v2>("lensOffset",buffer, cam.getLensOffset()));
+	cam.setForceAspectRatio(readValue<bool>("forceAspectRatio",buffer, cam.getForceAspectRatio()));
+	float aspectRatio = readValue<float>("aspectRatio",buffer, cam.getAspectRatio());
+	readValue<bool>("isOrtho",buffer, cam.getOrtho())?cam.enableOrtho():cam.disableOrtho();
+	cam.setVFlip(readValue<bool>("vFlip", buffer, cam.isVFlipped()));
+	if(cam.getForceAspectRatio()){
+		cam.setAspectRatio(aspectRatio);
+	}
+}
+//----------------------------------------
+static void saveEasyCam(const ofEasyCam &cam,  ofBuffer& buffer){
+	saveOfCam(cam, buffer);
+	buffer.append("--------------ofEasyCam parameters--------------\n");
+	writeValue<v3>("target", cam.getTarget().getPosition(),buffer);
+	writeValue<bool>("bEnableMouseMiddleButton", cam.getMouseMiddleButtonEnabled(), buffer);
+	writeValue<bool>("bMouseInputEnabled", cam.getMouseInputEnabled(), buffer);
+	writeValue<float>("drag", cam.getDrag(), buffer);
+	writeValue<char>("doTranslationKey", cam.getTranslationKey(), buffer);
+	writeValue<bool>("relativeYAxis", cam.getRelativeYAxis(), buffer);
+	writeValue<bool>("doInertia", cam.getInertiaEnabled(), buffer);
+	writeValue<v3>("upAxis", cam.getUpAxis(),buffer);
+	writeValue<ofRectangle>("controlArea", cam.getControlArea(), buffer);
+	writeValue<float>("distance", cam.getDistance(), buffer);
+}
+//----------------------------------------
+static void loadEasyCam(ofEasyCam & cam, ofBuffer& buffer){
+	loadOfCam(cam, buffer);
+	cam.setAutoDistance(false);
+	cam.setTarget(readValue<v3>("target",buffer,cam.getTarget().getPosition()));
+	cam.setDrag(readValue<float>("drag",buffer,cam.getDrag()));
+	readValue<bool>("bEnableMouseMiddleButton",buffer,cam.getMouseMiddleButtonEnabled())?cam.enableMouseMiddleButton():cam.disableMouseMiddleButton();
+	readValue<bool>("bMouseInputEnabled",buffer,cam.getMouseInputEnabled())?cam.enableMouseInput():cam.disableMouseInput();
+	cam.setTranslationKey(readValue<char>("doTranslationKey",buffer,cam.getTranslationKey()));
+	cam.setRelativeYAxis(readValue<bool>("relativeYAxis", buffer, cam.getRelativeYAxis()));
+	readValue<bool>("doInertia", buffer, cam.getInertiaEnabled())?cam.enableInertia():cam.disableInertia();
+	cam.setUpAxis(readValue<v3>("upAxis", buffer, cam.getUpAxis()));
+	cam.setControlArea(readValue<ofRectangle>("controlArea", buffer, cam.getControlArea()));
+	cam.setDistance(readValue<float>("distance", buffer, cam.getDistance()));
+}
+//----------------------------------------
+bool ofxSaveCamera(const ofNode &node, string savePath){
+	ofBuffer buffer;
+	saveOfNode(node, buffer);
+	return saveBuffer(savePath, buffer);
 }
 //----------------------------------------
 bool ofxLoadCamera(ofNode &node, string loadPath){
-	return loadOfNode(node, loadPath);
+	ofBuffer buffer;
+	if (loadBuffer(loadPath, buffer)) {
+		loadOfNode(node, buffer);
+		return true;
+	}
+	return false;
 }
 //----------------------------------------
-bool ofxSaveCamera(ofCamera &cam, string savePath){
- return saveOfCam(cam, savePath);
+bool ofxSaveCamera(const ofCamera &cam, string savePath){
+	ofBuffer buffer;
+	saveOfCam(cam, buffer);
+	return saveBuffer(savePath, buffer);
 }
 //----------------------------------------
 bool ofxLoadCamera(ofCamera & cam, string loadPath){
- return loadOfCam(cam, loadPath);
+	ofBuffer buffer;
+	if (loadBuffer(loadPath, buffer)) {
+		loadOfCam(cam, buffer);
+		return true;
+	}
+	return false;
 }
 //----------------------------------------
-bool ofxSaveCamera(ofEasyCam & cam, string savePath){
-    
-    if(saveOfCam((ofCamera &)cam, savePath)){
-        ofBuffer buffer = ofBufferFromFile(savePath);
-        
-        buffer.append("--------------ofEasyCam parameters--------------\n");
-        buffer.append("target\n" + ofToString(cam.getTarget().getPosition()) + "\n" );
-        buffer.append("bEnableMouseMiddleButton\n" + ofToString(cam.getMouseMiddleButtonEnabled())+"\n");
-        buffer.append("bMouseInputEnabled\n" + ofToString(cam.getMouseInputEnabled())+"\n");
-        buffer.append("drag\n" + ofToString(cam.getDrag())+"\n");
-        buffer.append("doTranslationKey\n" + ofToString(cam.getTranslationKey())+"\n");
-         if(ofBufferToFile(savePath, buffer)){
-            ofLogNotice("ofEasyCam saved successfully!");
-            return true;
-        }else{
-            ofLogWarning("failed to save ofEasyCam!");
-            return false;
-        }
-    }else{
-        return false;
-    }
+bool ofxSaveCamera(const ofEasyCam & cam, string savePath){
+	ofBuffer buffer;
+	saveEasyCam(cam, buffer);
+	return saveBuffer(savePath, buffer);
 }
 //----------------------------------------
 bool ofxLoadCamera(ofEasyCam & cam, string loadPath){
-	cam.setAutoDistance(false);
-
-    if(loadOfCam((ofCamera &)cam, loadPath)){
-        ofBuffer buffer = ofBufferFromFile(loadPath);
-         while (!buffer.isLastLine()) {
-            string line = buffer.getNextLine();
-            
-            if (line == "target") {
-                vector<string> vals = ofSplitString(buffer.getNextLine(), ", ");
-                if (vals.size()==3) {
-                    cam.getTarget().setPosition(ofVec3f(ofToFloat(vals[0]), ofToFloat(vals[1]), ofToFloat(vals[2])));
-                }
-            }
-            else if(line == "drag"){
-                cam.setDrag(ofToFloat(buffer.getNextLine()));
-            }else if(line == "bEnableMouseMiddleButton"){
-                if(ofToBool(buffer.getNextLine())){
-                    cam.enableMouseMiddleButton();
-                }else{
-                    cam.disableMouseMiddleButton();
-                }
-            }else if(line == "bMouseInputEnabled"){
-                if(ofToBool(buffer.getNextLine())){
-                    cam.enableMouseInput();
-                }else{
-                    cam.disableMouseInput();
-                }
-            }else if(line == "doTranslationKey"){
-                cam.setTranslationKey(ofToChar(buffer.getNextLine()));
-            }
-        }
-        return true;
-    }else {
-        return false;
-    }
+	ofBuffer buffer;
+	if (loadBuffer(loadPath, buffer)) {
+		loadEasyCam(cam, buffer);
+		return true;
+	}
+	return false;
 }
 

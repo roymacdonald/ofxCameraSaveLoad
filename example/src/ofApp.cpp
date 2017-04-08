@@ -1,22 +1,22 @@
-#include "testApp.h"
+#include "ofApp.h"
 
 //--------------------------------------------------------------
-void testApp::setup(){
+void ofApp::setup(){
 	ofSetVerticalSync(true);
-    ofxLoadCamera(cam, "ofEasyCamSettings");
+//    ofxLoadCamera(cam, "ofEasyCamSettings");
 }
 
 //--------------------------------------------------------------
-void testApp::update(){
+void ofApp::update(){
 	
 }
 
 //--------------------------------------------------------------
-void testApp::draw(){
+void ofApp::draw(){
 	
 	cam.begin();		
-	ofRotateX(ofRadToDeg(.5));
-	ofRotateY(ofRadToDeg(-.5));
+	ofRotateYRad(.5);
+	ofRotateYRad(-.5);
 	
 	ofBackground(0);
 	
@@ -39,10 +39,15 @@ void testApp::draw(){
 	cam.end();
 	
 	ofSetColor(255);
-    ofDrawBitmapStringHighlight("press key:\n\'s\' to save camera.\n\'l\' to load", 50, 50);
+	string msg = "press key:\n";
+	msg += "\'s\' : save camera\n";
+	msg += "\'l\' : load camera\n";
+	msg += "\'r\' : reset camera\n";
+	msg += "\'f\' : toggle fullscreen\n";
+    ofDrawBitmapStringHighlight(msg, 50, 50);
 }
 //--------------------------------------------------------------
-void testApp::keyPressed(int key){
+void ofApp::keyPressed(int key){
 	switch(key) {
 		case 'F':
 		case 'f':
@@ -64,12 +69,12 @@ void testApp::keyPressed(int key){
 }
 
 //--------------------------------------------------------------
-void testApp::keyReleased(int key){}
+void ofApp::keyReleased(int key){}
 //--------------------------------------------------------------
-void testApp::mouseMoved(int x, int y ){}
+void ofApp::mouseMoved(int x, int y ){}
 //--------------------------------------------------------------
-void testApp::mouseDragged(int x, int y, int button){}
+void ofApp::mouseDragged(int x, int y, int button){}
 //--------------------------------------------------------------
-void testApp::mousePressed(int x, int y, int button){}
+void ofApp::mousePressed(int x, int y, int button){}
 //--------------------------------------------------------------
-void testApp::mouseReleased(int x, int y, int button){}
+void ofApp::mouseReleased(int x, int y, int button){}
