@@ -1,6 +1,6 @@
 #include "ofMain.h"
 
-#define USE_GLM //glm is being used in OF v0.10 onwards. 
+//#define USE_GLM //glm is being used in OF v0.10 onwards. 
 //#define PRINT_DEBUG //uncomment this line to print the values as these are saved or loaded.
 
 bool ofxSaveCamera(const ofCamera &cam, string savePath);
