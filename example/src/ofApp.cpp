@@ -49,6 +49,8 @@ void ofApp::draw(){
 	msg += "\'r\' : reset camera\n";
 	msg += "\'f\' : toggle fullscreen\n";
     ofDrawBitmapStringHighlight(msg, 50, 50);
+	
+	
 }
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){

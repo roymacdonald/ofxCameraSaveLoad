@@ -20,7 +20,7 @@ T readValue(const string& valueName, ofBuffer& buffer, T val){
 					istringstream iss;
 					iss.str((string)(*it));
 					iss >> val;
-#if PRINT_DEBUG
+#ifdef PRINT_DEBUG
 					cout << "readValue " << valueName << " : " << *it << endl;
 #endif
 					return val;
@@ -35,7 +35,7 @@ template<class T>
 void writeValue(const string& valueName, const T& val, ofBuffer& buffer){
 	buffer.append(valueName + "\n"+ ofToString(val) + "\n");
 	
-#if PRINT_DEBUG
+#ifdef PRINT_DEBUG
 	cout << "writeValue " << valueName << " : "+ ofToString(val) <<endl;
 #endif
 }
@@ -123,13 +123,13 @@ static void saveEasyCam(  ofEasyCam &cam,  ofBuffer& buffer){
 	writeValue<v3>("upAxis", cam.getUpAxis(),buffer);
 	writeValue<ofRectangle>("controlArea", cam.getControlArea(), buffer);
 #endif
-	writeValue<float>("distance", cam.getDistance(), buffer);
 }
 //----------------------------------------
 static void loadEasyCam(ofEasyCam & cam, ofBuffer& buffer){
-	loadOfCam(cam, buffer);
+
 	cam.setAutoDistance(false);
 	cam.setTarget(readValue<v3>("target",buffer,cam.getTarget().getPosition()));
+	loadOfCam(cam, buffer);
 	cam.setDrag(readValue<float>("drag",buffer,cam.getDrag()));
 	readValue<bool>("bEnableMouseMiddleButton",buffer,cam.getMouseMiddleButtonEnabled())?cam.enableMouseMiddleButton():cam.disableMouseMiddleButton();
 	readValue<bool>("bMouseInputEnabled",buffer,cam.getMouseInputEnabled())?cam.enableMouseInput():cam.disableMouseInput();
@@ -140,7 +140,6 @@ static void loadEasyCam(ofEasyCam & cam, ofBuffer& buffer){
 	cam.setUpAxis(readValue<v3>("upAxis", buffer, cam.getUpAxis()));
 	cam.setControlArea(readValue<ofRectangle>("controlArea", buffer, cam.getControlArea()));
 #endif
-	cam.setDistance(readValue<float>("distance", buffer, cam.getDistance()));
 }
 //----------------------------------------
 bool ofxSaveCamera(const ofNode &node, string savePath){

@@ -1,10 +1,10 @@
 --------------ofNode parameters--------------
 position
-78.8506, -77.7143, 70.7843
+-30.3534, 1.92032, 81.2229
 scale
 1, 1, 1
 orientation
-0.284155, 0.387196, -0.126769, 0.867908
+1, 0, 0, 0
 --------------ofCamera parameters--------------
 fov
 60
@@ -33,5 +33,11 @@ drag
 0.9
 doTranslationKey
 m
-distance
-131.405
+relativeYAxis
+0
+doInertia
+0
+upAxis
+0, 1, 0
+controlArea
+0, 0, 0, 900, 700
