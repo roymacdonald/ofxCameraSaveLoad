@@ -14,10 +14,14 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
 	
-	cam.begin();		
+	cam.begin();
+#if OF_VERSION_MAJOR>0 || OF_VERSION_MINOR>9
 	ofRotateYRad(.5);
 	ofRotateYRad(-.5);
-	
+#else
+	ofRotateY(.5);
+	ofRotateY(-.5);
+#endif
 	ofBackground(0);
 	
 	ofSetColor(255,0,0);
