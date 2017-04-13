@@ -29,10 +29,7 @@ Compatibility
 
 * v2   
 	version 0.9.8 onwards.   
-Should support v0.10 as well.
-To achieve such, in file `ofxCameraSaveLoad/src/ofxCameraSaveLoad.h` uncomment the line that says:
-
-	`#define USE_GLM`
+	Supports v0.10 as well (and GLM) through preprocessor stuff.
 
 
 Known issues
@@ -52,6 +49,7 @@ Updated for OF v0.9.8
 * Simplified the whole loading and saving mechanism. 
 * Old saved files should still work.
 * Updated example
-* Supports GLM. Which should provide support for OF v0.10
+* Support for OF v0.10 (unreleased yet)
+* Supports GLM on v0.10 
 
 
