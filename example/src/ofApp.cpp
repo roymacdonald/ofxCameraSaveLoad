@@ -15,6 +15,7 @@ void ofApp::update(){
 void ofApp::draw(){
 	
 	cam.begin();
+	// Begin drawing cubes
 #if OF_VERSION_MAJOR>0 || OF_VERSION_MINOR>9
 	ofRotateYRad(.5);
 	ofRotateYRad(-.5);
@@ -40,6 +41,7 @@ void ofApp::draw(){
 	ofSetColor(0);
 	ofDrawBox(5);
 	ofPopMatrix();
+	// End drawing cubes
 	cam.end();
 	
 	ofSetColor(255);
