@@ -140,6 +140,7 @@ static void loadEasyCam(ofEasyCam & cam, ofBuffer& buffer){
 	cam.setUpAxis(readValue<v3>("upAxis", buffer, cam.getUpAxis()));
 	cam.setControlArea(readValue<ofRectangle>("controlArea", buffer, cam.getControlArea()));
 #endif
+	cam.setDistance(cam.getDistance()); // WORKAROUND: needed for right/middle drag after reset()
 }
 //----------------------------------------
 bool ofxSaveCamera(const ofNode &node, string savePath){
