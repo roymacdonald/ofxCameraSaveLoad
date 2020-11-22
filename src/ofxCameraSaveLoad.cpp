@@ -127,6 +127,7 @@ static void saveEasyCam(  ofEasyCam &cam,  ofBuffer& buffer){
 //----------------------------------------
 static void loadEasyCam(ofEasyCam & cam, ofBuffer& buffer){
 
+//	loadOfCam(cam, buffer);
 	cam.setAutoDistance(false);
 	cam.setTarget(readValue<v3>("target",buffer,cam.getTarget().getPosition()));
 	loadOfCam(cam, buffer);
@@ -140,7 +141,7 @@ static void loadEasyCam(ofEasyCam & cam, ofBuffer& buffer){
 	cam.setUpAxis(readValue<v3>("upAxis", buffer, cam.getUpAxis()));
 	cam.setControlArea(readValue<ofRectangle>("controlArea", buffer, cam.getControlArea()));
 #endif
-	cam.setDistance(cam.getDistance()); // WORKAROUND: needed for right/middle drag after reset()
+//	cam.setDistance(cam.getDistance()); // WORKAROUND: needed for right/middle drag after reset()
 }
 //----------------------------------------
 bool ofxSaveCamera(const ofNode &node, string savePath){
