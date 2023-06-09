@@ -1,4 +1,5 @@
 #include "ofxCameraSaveLoad.h"
+#define OFX_CAM_FIX_QUATERNIONS
 
 #ifdef USE_GLM
 typedef glm::vec3 v3 ;
@@ -74,7 +75,18 @@ static void saveOfNode(const ofNode &node, ofBuffer& buffer){
 static void loadOfNode(ofNode &node, ofBuffer& buffer){
 	node.setPosition(readValue<v3>("position", buffer, node.getPosition()));
 	node.setScale(readValue<v3>("scale",buffer, node.getScale()));
-	node.setOrientation(readValue<qq>("orientation", buffer, node.getOrientationQuat()));
+    auto orientation = readValue<qq>("orientation", buffer, node.getOrientationQuat());
+#ifdef OFX_CAM_FIX_QUATERNIONS
+    auto euler = glm::eulerAngles(orientation);
+            
+    euler.x = ofWrapRadians(euler.x, 0, 2 * glm::pi<float>());
+    euler.y = ofWrapRadians(euler.y, 0, 2 * glm::pi<float>());
+    euler.z = ofWrapRadians(euler.z, 0, 2 * glm::pi<float>());
+            
+    node.setOrientation(glm::quat(euler));
+#else
+    node.setOrientation(orientation);
+#endif
 }
 //----------------------------------------
 static void saveOfCam(const ofCamera &cam, ofBuffer& buffer){
